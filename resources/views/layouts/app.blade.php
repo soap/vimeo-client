@@ -16,6 +16,12 @@
 
         <!-- Styles -->
         @livewireStyles
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+        @filamentStyles
     </head>
     <body class="font-sans antialiased">
         <x-banner />
@@ -39,7 +45,8 @@
         </div>
 
         @stack('modals')
-
+        
+        @filamentScripts
         @livewireScripts
     </body>
 </html>
