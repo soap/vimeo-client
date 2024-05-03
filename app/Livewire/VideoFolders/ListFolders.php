@@ -3,16 +3,17 @@
 namespace App\Livewire\VideoFolders;
 
 use App\Models\VideoFolder;
+use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables;
-use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ListFolders extends Component implements HasForms, HasTable
@@ -21,6 +22,13 @@ class ListFolders extends Component implements HasForms, HasTable
     use InteractsWithTable;
 
     public $folder = null;
+
+    #[On('folder-changed')]
+    public function updateCurrentFolder(string $folder): void
+    {
+        $this->folder = $folder;
+        $this->resetTable();
+    }
 
     public function form(Form $form): Form
     {
@@ -42,7 +50,7 @@ class ListFolders extends Component implements HasForms, HasTable
                     $query->whereNull('parent_folder');
                 }
             })
-            ->heading('Folders')
+            ->heading($this->getAncestors())
             ->description('Organize your videos into folders')
             ->headerActions([
                 Tables\Actions\CreateAction::make()
@@ -50,7 +58,7 @@ class ListFolders extends Component implements HasForms, HasTable
                         Forms\Components\TextInput::make('name')
                             ->label('Name')
                             ->required(),
-                    ])
+                    ]),
             ])
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -61,7 +69,11 @@ class ListFolders extends Component implements HasForms, HasTable
                     ->iconColor('primary')
                     ->size('lg')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->description(fn (VideoFolder $record) => 'Folders: '.$record->folders_total.' Videos: '.$record->videos_total)
+                    ->action(function (VideoFolder $record): void {
+                        $this->dispatch('folder-changed', folder: $record->getKey());
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -100,5 +112,14 @@ class ListFolders extends Component implements HasForms, HasTable
     public function render(): View
     {
         return view('livewire.video-folders.list-folders');
+    }
+
+    private function getAncestors(): string
+    {
+        if ($this->folder) {
+            return VideoFolder::find($this->folder)->name;
+        }
+
+        return '/';
     }
 }

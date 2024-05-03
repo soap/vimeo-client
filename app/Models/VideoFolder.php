@@ -6,8 +6,8 @@ use App\Services\VimeoService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Sushi\Sushi;
 
 class VideoFolder extends Model
@@ -23,6 +23,8 @@ class VideoFolder extends Model
         'id' => 'string',
         'name' => 'string',
         'parent_folder' => 'string',
+        'videos_total' => 'integer',
+        'folders_total' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'last_accessed_at' => 'datetime',
@@ -37,6 +39,8 @@ class VideoFolder extends Model
                 'id' => $folder['uri'],
                 'name' => $folder['name'],
                 'parent_folder' => Arr::get($folder, 'metadata.connections.parent_folder.uri'),
+                'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
+                'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
                 'created_at' => Carbon::parse($folder['created_time']),
                 'updated_at' => Carbon::parse($folder['modified_time']),
                 'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
