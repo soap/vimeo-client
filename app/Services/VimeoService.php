@@ -10,7 +10,8 @@ class VimeoService
      * Create a new class instance.
      */
     public function __construct(private VimeoManager $vimeo)
-    {}
+    {
+    }
 
     public function getFolders(int $page = 1, int $per_page = 50)
     {

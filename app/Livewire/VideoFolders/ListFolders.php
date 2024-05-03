@@ -123,9 +123,10 @@ class ListFolders extends Component implements HasForms, HasTable
     private function getBreadcrumbs(): string
     {
 
-        if ( !is_null($this->folder )) {
+        if (! is_null($this->folder)) {
 
             $breadcrumbs = VideoFolder::find($this->folder)->getBreadcrumbs();
+
             return implode(' / ', $breadcrumbs);
 
             $breadcrumbs = '';
@@ -136,6 +137,7 @@ class ListFolders extends Component implements HasForms, HasTable
                 }
             }
             dd($breadcrumbs);
+
             return $breadcrumbs;
         }
 

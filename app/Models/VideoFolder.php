@@ -54,7 +54,7 @@ class VideoFolder extends Model
     /**
      * Get the ancestors of the folder.
      * for better performance maybe you can cache the ancestors
-     * or use nested set pattern 
+     * or use nested set pattern
      */
     public function getAncestors(array $attributes = [])
     {
