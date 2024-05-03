@@ -50,10 +50,16 @@ class ListFolders extends Component implements HasForms, HasTable
                     $query->whereNull('parent_folder');
                 }
             })
-            ->heading($this->getAncestors())
+            ->heading($this->getBreadcrumbs())
             ->description('Organize your videos into folders')
             ->headerActions([
+                Tables\Actions\Action::make('Up')
+                    ->label('Up')
+                    ->icon('heroicon-o-chevron-up')
+                    ->action(fn () => $this->goUp())
+                    ->visible($this->folder !== null),
                 Tables\Actions\CreateAction::make()
+                    ->label('New Folder')
                     ->form([
                         Forms\Components\TextInput::make('name')
                             ->label('Name')
@@ -114,12 +120,31 @@ class ListFolders extends Component implements HasForms, HasTable
         return view('livewire.video-folders.list-folders');
     }
 
-    private function getAncestors(): string
+    private function getBreadcrumbs(): string
     {
-        if ($this->folder) {
-            return VideoFolder::find($this->folder)->name;
+
+        if ( !is_null($this->folder )) {
+
+            $breadcrumbs = VideoFolder::find($this->folder)->getBreadcrumbs();
+            return implode(' / ', $breadcrumbs);
+
+            $breadcrumbs = '';
+            foreach ($ancestors as $ancestor) {
+                $breadcrumbs .= $ancestor->name;
+                if ($ancestor->parent_folder) {
+                    $breadcrumbs .= ' / ';
+                }
+            }
+            dd($breadcrumbs);
+            return $breadcrumbs;
         }
 
         return '/';
+    }
+
+    protected function goUp(): void
+    {
+        $this->folder = VideoFolder::find($this->folder)->parent_folder;
+        $this->resetTable();
     }
 }

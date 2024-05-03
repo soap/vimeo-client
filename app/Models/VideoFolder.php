@@ -51,6 +51,33 @@ class VideoFolder extends Model
         return $mapped;
     }
 
+    /**
+     * Get the ancestors of the folder.
+     * for better performance maybe you can cache the ancestors
+     * or use nested set pattern 
+     */
+    public function getAncestors(array $attributes = [])
+    {
+        $ancestors = [];
+        $folder = $this;
+        while ($folder->parent) {
+            $ancestors[] = $folder->parent;
+            $folder = $folder->parent;
+        }
+
+        return array_reverse($ancestors);
+    }
+
+    public function getBreadcrumbs()
+    {
+        $ancestors = collect($this->getAncestors());
+        $breadcrumbs = $ancestors->map(function ($folder) {
+            return $folder->name;
+        })->toArray();
+
+        return array_merge($breadcrumbs, [$this->name]);
+    }
+
     public function parent()
     {
         return $this->belongsTo(VideoFolder::class, 'parent_folder');
@@ -58,11 +85,12 @@ class VideoFolder extends Model
 
     protected function sushiShouldCache()
     {
-        return false;
+        return true;
     }
 
+    /*
     protected function sushiCacheReferencePath()
     {
         return Storage::disk('local')->path('video_folders');
-    }
+    }*/
 }

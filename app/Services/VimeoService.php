@@ -10,8 +10,7 @@ class VimeoService
      * Create a new class instance.
      */
     public function __construct(private VimeoManager $vimeo)
-    {
-    }
+    {}
 
     public function getFolders(int $page = 1, int $per_page = 50)
     {
@@ -68,7 +67,7 @@ class VimeoService
 
     }
 
-    protected function getFolderItems(string $folder_id, int $page = 1, int $per_page = 50)
+    public function getFolderVideos(string $folder_id, int $page = 1, int $per_page = 50)
     {
         // Get all items in a folder
         $response = $this->vimeo->request("/me/folders/{$folder_id}/videos", [
@@ -79,10 +78,35 @@ class VimeoService
         return $response['body']['data'];
     }
 
+    public function getFolderItems(string $folder_id, int $page = 1, int $per_page = 50)
+    {
+        // Get all items in a folder
+        $response = $this->vimeo->request("/me/folders/{$folder_id}/items", [
+            'per_page' => $per_page,
+            'page' => $page,
+        ], 'GET');
+
+        return $response['body']['data'];
+    }
+
+    /**
+     * Get a single folder details
+     */
     public function getFolder(string $folder_id)
     {
         // Get a specific folder
         $response = $this->vimeo->request("/me/folders/{$folder_id}", [], 'GET');
+
+        return $response['body'];
+    }
+
+    /**
+     * Get a single video
+     */
+    public function getVideo(string $video_id)
+    {
+        // Get a specific video
+        $response = $this->vimeo->request("/me/videos/{$video_id}", [], 'GET');
 
         return $response['body'];
     }
