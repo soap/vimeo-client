@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\VideoFolder;
 use App\Services\VimeoService;
 use Illuminate\Http\Request;
 
@@ -17,9 +16,7 @@ class VimeoFoldersController extends Controller
      */
     public function index()
     {
-        $folders = VideoFolder::where('parent_folder', null)->get();
-
-        return view('vimeo-folders.index', compact('folders'));
+        return view('vimeo-folders.index');
     }
 
     /**

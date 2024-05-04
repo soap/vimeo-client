@@ -22,6 +22,7 @@ class VideoFolder extends Model
     protected $schema = [
         'id' => 'string',
         'name' => 'string',
+        'item_type' => 'string', // 'folder' or 'video
         'parent_folder' => 'string',
         'videos_total' => 'integer',
         'folders_total' => 'integer',
@@ -38,15 +39,46 @@ class VideoFolder extends Model
             return [
                 'id' => $folder['uri'],
                 'name' => $folder['name'],
+                'item_type' => 'folder', // 'folder' or 'video
+                'image' => null,
                 'parent_folder' => Arr::get($folder, 'metadata.connections.parent_folder.uri'),
                 'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
                 'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
+
                 'created_at' => Carbon::parse($folder['created_time']),
                 'updated_at' => Carbon::parse($folder['modified_time']),
                 'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
                 //'metadata' => $folder['metadata'],
             ];
         })->toArray();
+
+        $videos = app()->make(VimeoService::class)->getAllVideos();
+        $mapped = array_merge($mapped, collect($videos)->map(function ($video) {
+            return [
+                'id' => $video['uri'],
+                'name' => $video['name'],
+                'item_type' => 'video', // 'folder' or 'video
+                'image' => Arr::get($video, 'pictures.sizes.0.link'),
+                'parent_folder' => Arr::get($video, 'parent_folder.uri'),
+                'videos_total' => 0,
+                'folders_total' => 0,
+
+                //'description' => $video['description'],
+                //'link' => $video['link'],
+                //'player_embed_url' => $video['player_embed_url'],
+                //'duration' => $video['duration'],
+                //'width' => $video['width'],
+                //'height' => $video['height'],
+                //`status` => $video['status'],
+
+                //'release_time' => Carbon::parse($video['release_time']),
+                //'transcode_status' => Arr::get($video, 'transcode'),
+                'created_at' => Carbon::parse($video['created_time']),
+                'updated_at' => Carbon::parse($video['modified_time']),
+                'last_accessed_at' => Carbon::parse($video['last_user_action_event_date']),
+                //'metadata' => $video['metadata'],
+            ];
+        })->toArray());
 
         return $mapped;
     }

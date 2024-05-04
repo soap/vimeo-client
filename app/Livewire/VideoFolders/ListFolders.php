@@ -52,6 +52,8 @@ class ListFolders extends Component implements HasForms, HasTable
             })
             ->heading($this->getBreadcrumbs())
             ->description('Organize your videos into folders')
+            ->emptyStateHeading('')
+            ->emptyStateDescription('')
             ->headerActions([
                 Tables\Actions\Action::make('Up')
                     ->label('Up')
@@ -71,14 +73,16 @@ class ListFolders extends Component implements HasForms, HasTable
                     ->label('ID')
                     ->hidden(),
                 Tables\Columns\TextColumn::make('name')
-                    ->icon('heroicon-o-folder')
+                    ->icon(fn (VideoFolder $record) => ($record->item_type === 'folder') ? 'heroicon-o-folder' : 'heroicon-o-play-circle')
                     ->iconColor('primary')
                     ->size('lg')
                     ->sortable()
                     ->searchable()
-                    ->description(fn (VideoFolder $record) => 'Folders: '.$record->folders_total.' Videos: '.$record->videos_total)
+                    ->description(fn (VideoFolder $record) => $record->item_type === 'folder' ? 'Folders: '.$record->folders_total.' Videos: '.$record->videos_total : '')
                     ->action(function (VideoFolder $record): void {
-                        $this->dispatch('folder-changed', folder: $record->getKey());
+                        if ($record->item_type === 'folder') {
+                            $this->dispatch('folder-changed', folder: $record->getKey());
+                        }
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->searchable()
