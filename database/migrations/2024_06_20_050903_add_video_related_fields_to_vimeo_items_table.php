@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('height')->nullable()->after('metadata');
             $table->integer('width')->nullable()->after('metadata');
             $table->string('transcode_status')->nullable()->after('metadata');
-            $table->datetime('release_time')->nullable()->after('metadata');            
+            $table->datetime('release_time')->nullable()->after('metadata');
         });
     }
 

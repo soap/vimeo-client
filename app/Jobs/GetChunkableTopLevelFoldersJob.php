@@ -26,35 +26,36 @@ class GetChunkableTopLevelFoldersJob extends ChunkableJob implements ShouldQueue
     {
         //
     }
-    
+
     public function defineChunk(): ?Chunk
     {
         $count = $this->vimeo->getFolderTotal();
-        Log::info(sprintf("GetChunkableTopLevelFolders: defined chunk of %d records", $count));
+        Log::info(sprintf('GetChunkableTopLevelFolders: defined chunk of %d records', $count));
+
         return new Chunk(totalItems: $count, chunkSize: 100, startingPosition: 1);
     }
 
     protected function handleChunk(Chunk $chunk): void
     {
-        Log::info(sprintf("GetChunkableTopLevelFolders: process chunk number: %d, size of: %d", $chunk->position, $chunk->size));
+        Log::info(sprintf('GetChunkableTopLevelFolders: process chunk number: %d, size of: %d', $chunk->position, $chunk->size));
         $folders = $this->vimeo->getFolders(page: $chunk->position, per_page: $chunk->size);
         $topLevelFolders = $this->filterTopLevelFolders($folders);
         $i = 1;
-        foreach($topLevelFolders as $folder) {
-            Log::debug(sprintf("GetChunkableTopLevelFolders: #%d, name: %s, uri: %s", $i++, $folder['name'], $folder['uri']));
+        foreach ($topLevelFolders as $folder) {
+            Log::debug(sprintf('GetChunkableTopLevelFolders: #%d, name: %s, uri: %s', $i++, $folder['name'], $folder['uri']));
             VimeoItem::updateOrCreate([
-                    'uri' => $folder['uri']    
-                ],[
-                    'name' => $folder['name'],
-                    'item_type' => 'folder',
-                    'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
-                    'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
-                    'pictures' => null,
-                    'metadata' => json_encode($folder['metadata']),
-                    'created_at' => Carbon::parse($folder['created_time']),
-                    'updated_at' => Carbon::parse($folder['modified_time']),
-                    'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
-                ]);
+                'uri' => $folder['uri'],
+            ], [
+                'name' => $folder['name'],
+                'item_type' => 'folder',
+                'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
+                'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
+                'pictures' => null,
+                'metadata' => json_encode($folder['metadata']),
+                'created_at' => Carbon::parse($folder['created_time']),
+                'updated_at' => Carbon::parse($folder['modified_time']),
+                'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
+            ]);
         }
     }
 
@@ -66,5 +67,4 @@ class GetChunkableTopLevelFoldersJob extends ChunkableJob implements ShouldQueue
         });
 
     }
-
 }

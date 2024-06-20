@@ -34,21 +34,21 @@ class GetTopLevelFoldersJob implements ShouldQueue
         $folders = $this->vimeo->getTopLevelFolders();
 
         $i = 1;
-        foreach($folders as $folder) {
-            Log::debug(sprintf("GetTopLevelFolders: #%d, name: %s, uri: %s", $i++, $folder['name'], $folder['uri']));
+        foreach ($folders as $folder) {
+            Log::debug(sprintf('GetTopLevelFolders: #%d, name: %s, uri: %s', $i++, $folder['name'], $folder['uri']));
             VimeoItem::updateOrCreate([
-                    'uri' => $folder['uri']    
-                ],[
-                    'name' => $folder['name'],
-                    'item_type' => 'folder',
-                    'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
-                    'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
-                    'pictures' => null,
-                    'metadata' => json_encode($folder['metadata']),
-                    'created_at' => Carbon::parse($folder['created_time']),
-                    'updated_at' => Carbon::parse($folder['modified_time']),
-                    'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
-                ]);   
+                'uri' => $folder['uri'],
+            ], [
+                'name' => $folder['name'],
+                'item_type' => 'folder',
+                'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
+                'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
+                'pictures' => null,
+                'metadata' => json_encode($folder['metadata']),
+                'created_at' => Carbon::parse($folder['created_time']),
+                'updated_at' => Carbon::parse($folder['modified_time']),
+                'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
+            ]);
         }
     }
 }

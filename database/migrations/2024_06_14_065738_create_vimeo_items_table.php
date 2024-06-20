@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('item_type')->default('video')->comment('video or folder');
             //$table->string('resource_key');
-    
+
             //$table->string('manage_link');
             $table->unsignedInteger('videos_total')->default(0);
             $table->unsignedInteger('folders_total')->default(0);

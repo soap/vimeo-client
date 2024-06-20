@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
 
 class VideoFolder extends Model
 {
@@ -119,5 +118,4 @@ class VideoFolder extends Model
     {
         return $this->belongsTo(VideoFolder::class, 'parent_folder');
     }
-
 }

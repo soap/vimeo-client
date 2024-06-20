@@ -2,42 +2,40 @@
 
 namespace App\Services;
 
-use Vimeo\Laravel\VimeoManager;
 use Illuminate\Support\Arr;
+use Vimeo\Laravel\VimeoManager;
 
 class VimeoService
 {
-
     protected $attributes = [
         'video' => [
-            'name', 
-            'uri', 
-            'description', 
-            'last_user_action_event_date', 
-            'release_time', 
-            'created_time', 
-            'duration', 'link', 
-            'embed.html', 
-            'pictures.sizes'
+            'name',
+            'uri',
+            'description',
+            'last_user_action_event_date',
+            'release_time',
+            'created_time',
+            'duration', 'link',
+            'embed.html',
+            'pictures.sizes',
         ],
         'folder' => [
-          'name',
-          'uri',
-          'metadata',
-          'release_time', 
-          'created_time', 
-          'last_user_action_event_date',   
-        ]
+            'name',
+            'uri',
+            'metadata',
+            'release_time',
+            'created_time',
+            'last_user_action_event_date',
+        ],
     ];
+
     /**
      * Create a new class instance.
      */
-    public function __construct(private VimeoManager $vimeo)
-    {
-    }
+    public function __construct(private VimeoManager $vimeo) {}
 
-    public function getFolders(int $page = 1, int $per_page = 50, 
-        string $sort = 'date', string $direction = 'asc', 
+    public function getFolders(int $page = 1, int $per_page = 50,
+        string $sort = 'date', string $direction = 'asc',
         array $attributes = [])
     {
         // Get all folders
@@ -130,7 +128,7 @@ class VimeoService
     public function getFolderTotal()
     {
         $response = $this->vimeo->request('/me/folders', [
-            'per_page' => 1
+            'per_page' => 1,
         ]);
 
         $total = $response['body']['total'];
@@ -148,7 +146,6 @@ class VimeoService
             'fields' => ! empty($attributes) ? implode(',', $attributes) : null,
         ], 'GET');
 
-        
         $total = $response['body']['total'];
         $pageCount = round($total / 100);
         $videos = $response['body']['data'];
@@ -185,7 +182,8 @@ class VimeoService
 
     /**
      * Get a single video
-     * @param string $video_id Vimeo video ID or uri
+     *
+     * @param  string  $video_id  Vimeo video ID or uri
      */
     public function getVideo(string $video_id, array $attributes = [])
     {

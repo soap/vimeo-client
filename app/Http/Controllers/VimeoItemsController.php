@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 
 class VimeoItemsController extends Controller
 {
-    public function __construct(private VimeoService $vimeoService)
-    {
-    }
+    public function __construct(private VimeoService $vimeoService) {}
 
     /**
      * Display a listing of the resource.
