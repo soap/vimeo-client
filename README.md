@@ -14,7 +14,7 @@ We would like to extend our thanks to the following sponsors for funding Vimeo C
 
 ## Contributing
 
-Thank you for considering contributing to the Vimeo Client! The contribution guide can be found [here]().
+Thank you for considering contributing to the Vimeo Client! The contribution guide can be found [here](./CONTRIBUTIONS.md).
 
 
 ## Security Vulnerabilities
