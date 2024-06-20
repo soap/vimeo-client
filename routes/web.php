@@ -1,13 +1,11 @@
 <?php
 
-use App\Http\Controllers\VimeoFoldersController;
+use App\Http\Controllers\VimeoItemsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/vimeo/folders', [VimeoFoldersController::class, 'index'])->name('vimeo.folders');
 
 Route::middleware([
     'auth:sanctum',
@@ -18,5 +16,5 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/vimeo/folders', [VimeoFoldersController::class, 'index'])->name('vimeo.folders');
+    Route::get('/vimeo/items', [VimeoItemsController::class, 'index'])->name('vimeo.items');
 });

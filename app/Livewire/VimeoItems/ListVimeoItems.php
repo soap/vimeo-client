@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Livewire\VideoFolders;
+namespace App\Livewire\VimeoItems;
 
-use App\Models\VideoFolder;
+use App\Models\VimeoItem;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class ListFolders extends Component implements HasForms, HasTable
+class ListVimeoItems extends Component implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
@@ -42,12 +42,12 @@ class ListFolders extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(VideoFolder::query())
+            ->query(VimeoItem::query())
             ->modifyQueryUsing(function (Builder $query) {
                 if ($this->folder) {
-                    $query->where('parent_folder', $this->folder);
+                    $query->where('parent_id', $this->folder->id);
                 } else {
-                    $query->whereNull('parent_folder');
+                    $query->whereNull('parent_id');
                 }
             })
             ->heading($this->getBreadcrumbs())
@@ -73,26 +73,25 @@ class ListFolders extends Component implements HasForms, HasTable
                     ->label('ID')
                     ->hidden(),
                 Tables\Columns\TextColumn::make('name')
-                    ->icon(fn (VideoFolder $record) => ($record->item_type === 'folder') ? 'heroicon-o-folder' : 'heroicon-o-play-circle')
+                    ->icon(fn (VimeoItem $record) => ($record->item_type == 'folder') ? 'heroicon-o-folder' : 'heroicon-o-play-circle')
                     ->iconColor('primary')
                     ->size('lg')
                     ->sortable()
                     ->searchable()
-                    ->description(fn (VideoFolder $record) => $record->item_type === 'folder' ? 'Folders: '.$record->folders_total.' Videos: '.$record->videos_total : '')
-                    ->action(function (VideoFolder $record): void {
+                    ->description(fn (VimeoItem $record) => $record->item_type == 'folder' ? 'Folders: '.$record->folders_total.' Videos: '.$record->videos_total : '')
+                    ->action(function (VimeoItem $record): void {
                         if ($record->item_type === 'folder') {
                             $this->dispatch('folder-changed', folder: $record->getKey());
                         }
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('last_accessed_at')
-                    ->sortable()
-                    ->searchable(),
+                    ->sortable(),
             ])
             ->striped()
             ->filters([
@@ -102,15 +101,15 @@ class ListFolders extends Component implements HasForms, HasTable
                 Tables\Actions\ViewAction::make()
                     ->label('View')
                     ->icon('heroicon-o-eye')
-                    ->action(fn (VideoFolder $folder) => redirect()->route('video-folders.show', $folder)),
+                    ->action(fn (VimeoItem $folder) => redirect()->route('vime-items.show', $folder)),
                 Tables\Actions\EditAction::make()
                     ->label('Edit')
                     ->icon('heroicon-o-pencil')
-                    ->action(fn (V0ideoFolder $folder) => redirect()->route('video-folders.edit', $folder)),
+                    ->action(fn (VimeoItem $folder) => redirect()->route('vimeo-items.edit', $folder)),
                 Tables\Actions\DeleteAction::make()
                     ->label('Delete')
                     ->icon('heroicon-o-trash')
-                    ->action(fn (VideoFolder $folder) => $folder->delete()),
+                    ->action(fn (VimeoItem $item) => $item->delete()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -121,36 +120,17 @@ class ListFolders extends Component implements HasForms, HasTable
 
     public function render(): View
     {
-        return view('livewire.video-folders.list-folders');
+        return view('livewire.vimeo-items.list-vimeo-items');
     }
 
     private function getBreadcrumbs(): string
     {
-
-        if (! is_null($this->folder)) {
-
-            $breadcrumbs = VideoFolder::find($this->folder)->getBreadcrumbs();
-
-            return implode(' / ', $breadcrumbs);
-
-            $breadcrumbs = '';
-            foreach ($ancestors as $ancestor) {
-                $breadcrumbs .= $ancestor->name;
-                if ($ancestor->parent_folder) {
-                    $breadcrumbs .= ' / ';
-                }
-            }
-            dd($breadcrumbs);
-
-            return $breadcrumbs;
-        }
-
-        return '/';
+        return '';
     }
 
     protected function goUp(): void
     {
-        $this->folder = VideoFolder::find($this->folder)->parent_folder;
+        $this->folder = VimeoItem::find($this->folder)->parent;
         $this->resetTable();
     }
 }

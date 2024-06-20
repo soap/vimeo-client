@@ -6,13 +6,15 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "calebporzio/sushi": "^2.4",
         "filament/tables": "^3.2",
+        "kalnoy/nestedset": "^6.0",
         "laravel/framework": "^11.0",
         "laravel/jetstream": "^5.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.0",
+        "sammyjo20/laravel-chunkable-jobs": "^1.1",
+        "stancl/virtualcolumn": "^1.4",
         "vimeo/laravel": "^5.9"
     },
     "require-dev": {
@@ -37,6 +39,12 @@
             "Tests\\": "tests/"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soap/version"
+        }
+    ],
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

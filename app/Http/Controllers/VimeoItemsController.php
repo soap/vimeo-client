@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\VimeoService;
 use Illuminate\Http\Request;
 
-class VimeoFoldersController extends Controller
+class VimeoItemsController extends Controller
 {
     public function __construct(private VimeoService $vimeoService)
     {
@@ -16,7 +16,7 @@ class VimeoFoldersController extends Controller
      */
     public function index()
     {
-        return view('vimeo-folders.index');
+        return view('vimeo-items.index');
     }
 
     /**

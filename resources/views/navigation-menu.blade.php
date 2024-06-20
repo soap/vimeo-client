@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('vimeo.folders') }}" :active="request()->routeIs('vimeo.folders')">
+                    <x-nav-link href="{{ route('vimeo.items') }}" :active="request()->routeIs('vimeo.items')">
                         {{ __('Vimeo Library') }}
                     </x-nav-link>
                 </div>
@@ -151,7 +151,7 @@
         </div>
 
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link href="{{ route('vimeo.folders') }}" :active="request()->routeIs('vimeo.folders')">
+            <x-responsive-nav-link href="{{ route('vimeo.items') }}" :active="request()->routeIs('vimeo.items')">
                 {{ __('Vimeo Library') }}
             </x-responsive-nav-link>
         </div>

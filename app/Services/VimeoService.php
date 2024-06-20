@@ -3,9 +3,32 @@
 namespace App\Services;
 
 use Vimeo\Laravel\VimeoManager;
+use Illuminate\Support\Arr;
 
 class VimeoService
 {
+
+    protected $attributes = [
+        'video' => [
+            'name', 
+            'uri', 
+            'description', 
+            'last_user_action_event_date', 
+            'release_time', 
+            'created_time', 
+            'duration', 'link', 
+            'embed.html', 
+            'pictures.sizes'
+        ],
+        'folder' => [
+          'name',
+          'uri',
+          'metadata',
+          'release_time', 
+          'created_time', 
+          'last_user_action_event_date',   
+        ]
+    ];
     /**
      * Create a new class instance.
      */
@@ -13,23 +36,29 @@ class VimeoService
     {
     }
 
-    public function getFolders(int $page = 1, int $per_page = 50, array $attributes = [])
+    public function getFolders(int $page = 1, int $per_page = 50, 
+        string $sort = 'date', string $direction = 'asc', 
+        array $attributes = [])
     {
         // Get all folders
         $response = $this->vimeo->request('/me/folders', [
             'per_page' => $per_page,
             'page' => $page,
+            'sort' => $sort,
+            'direction' => $direction,
             'fields' => ! empty($attributes) ? implode(',', $attributes) : null,
         ], 'GET');
 
         return $response['body']['data'];
     }
 
-    public function getTopFolders(array $attributes = [])
+    public function getTopLevelFolders(array $attributes = [])
     {
         // Get all top-level folders
         $response = $this->vimeo->request('/me/folders', [
             'per_page' => 100,
+            'sort' => 'date',
+            'direction' => 'asc',
             'fields' => ! empty($attributes) ? implode(',', $attributes) : null,
         ], 'GET');
 
@@ -37,7 +66,9 @@ class VimeoService
         $pageCount = round($total / 100);
         $folders = $this->filterTopLevelFolders($response['body']['data']);
         for ($i = 2; $i <= $pageCount; $i++) {
-            $folders = array_merge($folders, $this->filterTopLevelFolders($this->getFolders($i, 100, $attributes)));
+            $folders = array_merge($folders, $this->filterTopLevelFolders($this->getFolders(
+                page: $i, per_page: 100, attributes: $attributes, sort: 'date', direction: 'asc'
+            )));
         }
 
         return $folders;
@@ -65,7 +96,7 @@ class VimeoService
     {
         // Filter top-level folders
         return array_filter($folders, function ($folder) {
-            return empty($folder['metadata']['connections']['parent_folder']);
+            return empty(Arr::get($folder, 'metadata.connections.ancestor_path'));
         });
 
     }
@@ -88,10 +119,23 @@ class VimeoService
         $response = $this->vimeo->request('/me/videos', [
             'per_page' => $per_page,
             'page' => $page,
+            'sort' => 'last_user_action_event_date',
+            'direction' => 'desc', // 'asc' or 'desc
             'fields' => ! empty($attributes) ? implode(',', $attributes) : null,
         ], 'GET');
 
         return $response['body']['data'];
+    }
+
+    public function getFolderTotal()
+    {
+        $response = $this->vimeo->request('/me/folders', [
+            'per_page' => 1
+        ]);
+
+        $total = $response['body']['total'];
+
+        return $total;
     }
 
     public function getAllVideos(array $attributes = [])
@@ -99,9 +143,12 @@ class VimeoService
         // Get all videos
         $response = $this->vimeo->request('/me/videos', [
             'per_page' => 100,
+            'sort' => 'last_user_action_event_date',
+            'direction' => 'desc', // 'asc' or 'desc
             'fields' => ! empty($attributes) ? implode(',', $attributes) : null,
         ], 'GET');
 
+        
         $total = $response['body']['total'];
         $pageCount = round($total / 100);
         $videos = $response['body']['data'];
@@ -138,9 +185,13 @@ class VimeoService
 
     /**
      * Get a single video
+     * @param string $video_id Vimeo video ID or uri
      */
     public function getVideo(string $video_id, array $attributes = [])
     {
+        if (str_contains($video_id, '/videos/')) {
+            $video_id = str_replace('/videos/', '', $video_id);
+        }
         // Get a specific video
         $response = $this->vimeo->request("/me/videos/{$video_id}", [
             'fields' => ! empty($attributes) ? implode(',', $attributes) : null,

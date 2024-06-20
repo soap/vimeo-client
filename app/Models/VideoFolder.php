@@ -8,12 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Sushi\Sushi;
 
 class VideoFolder extends Model
 {
     use HasFactory;
-    use Sushi;
 
     public $incrementing = false;
 
@@ -29,7 +27,15 @@ class VideoFolder extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'last_accessed_at' => 'datetime',
+        'data' => 'json',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
     public function getRows()
     {
@@ -44,7 +50,7 @@ class VideoFolder extends Model
                 'parent_folder' => Arr::get($folder, 'metadata.connections.parent_folder.uri'),
                 'videos_total' => Arr::get($folder, 'metadata.connections.videos.total'),
                 'folders_total' => Arr::get($folder, 'metadata.connections.folders.total'),
-
+                'data' => json_encode([]),
                 'created_at' => Carbon::parse($folder['created_time']),
                 'updated_at' => Carbon::parse($folder['modified_time']),
                 'last_accessed_at' => Carbon::parse($folder['last_user_action_event_date']),
@@ -62,17 +68,16 @@ class VideoFolder extends Model
                 'parent_folder' => Arr::get($video, 'parent_folder.uri'),
                 'videos_total' => 0,
                 'folders_total' => 0,
-
-                //'description' => $video['description'],
-                //'link' => $video['link'],
-                //'player_embed_url' => $video['player_embed_url'],
-                //'duration' => $video['duration'],
-                //'width' => $video['width'],
-                //'height' => $video['height'],
-                //`status` => $video['status'],
-
-                //'release_time' => Carbon::parse($video['release_time']),
-                //'transcode_status' => Arr::get($video, 'transcode'),
+                'data' => json_encode([
+                    'description' => $video['description'],
+                    'link' => $video['link'],
+                    'player_embed_url' => $video['player_embed_url'],
+                    'duration' => $video['duration'],
+                    'width' => $video['width'],
+                    'height' => $video['height'],
+                    'release_time' => Carbon::parse($video['release_time']),
+                    'transcode_status' => Arr::get($video, 'transcode'),
+                ]),
                 'created_at' => Carbon::parse($video['created_time']),
                 'updated_at' => Carbon::parse($video['modified_time']),
                 'last_accessed_at' => Carbon::parse($video['last_user_action_event_date']),
@@ -115,14 +120,4 @@ class VideoFolder extends Model
         return $this->belongsTo(VideoFolder::class, 'parent_folder');
     }
 
-    protected function sushiShouldCache()
-    {
-        return true;
-    }
-
-    /*
-    protected function sushiCacheReferencePath()
-    {
-        return Storage::disk('local')->path('video_folders');
-    }*/
 }
